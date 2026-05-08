@@ -326,7 +326,7 @@ This project is intended to strengthen competency in:
 Current Status:
 
 ```text
-Phase 01 — Baseline RAG Architecture Initialization
+Phase 01 - Baseline RAG Architecture Initialization
 ```
 
 ---
