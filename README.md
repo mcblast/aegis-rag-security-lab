@@ -195,7 +195,7 @@ This structure preserves architectural evolution, implementation history, and se
 
 # Planned Phases
 
-## Phase 01 — Baseline RAG Pipeline
+## Phase 01 - Baseline RAG Pipeline
 
 - Local document ingestion
 - Chunking
@@ -203,21 +203,21 @@ This structure preserves architectural evolution, implementation history, and se
 - Mock LLM integration
 - Source-aware responses
 
-## Phase 02 — Threat Modeling
+## Phase 02 - Threat Modeling
 
 - AI threat surface analysis
 - Risk register creation
 - Trust boundary mapping
 - Attack path identification
 
-## Phase 03 — Prompt Injection Lab
+## Phase 03 - Prompt Injection Lab
 
 - Direct prompt injection testing
 - Indirect prompt injection scenarios
 - Retrieval poisoning demonstrations
 - Attack simulation framework
 
-## Phase 04 — RAG Security Controls
+## Phase 04 - RAG Security Controls
 
 - Retrieval access control
 - Document classification
@@ -225,28 +225,28 @@ This structure preserves architectural evolution, implementation history, and se
 - Prompt boundary enforcement
 - Output validation
 
-## Phase 05 — Governance & Policy
+## Phase 05 - Governance & Policy
 
 - AI governance controls
 - Risk classification
 - Human-in-the-loop workflows
 - Policy enforcement engine
 
-## Phase 06 — Agent & Tool Security
+## Phase 06 - Agent & Tool Security
 
 - Tool invocation restrictions
 - Approval gates
 - Action logging
 - Role-aware tool access
 
-## Phase 07 — Monitoring & Evaluation
+## Phase 07 - Monitoring & Evaluation
 
 - Security telemetry
 - Adversarial evaluation metrics
 - Attack success tracking
 - Risk analytics
 
-## Phase 08 — Final Integration
+## Phase 08 - Final Integration
 
 - Consolidated architecture
 - Security documentation
