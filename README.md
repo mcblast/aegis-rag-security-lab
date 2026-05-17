@@ -75,6 +75,85 @@ Response
 
 ---
 
+# Phase 01 - Baseline RAG Pipeline
+
+Phase 01 implements a minimal local RAG pipeline that can be studied, tested, attacked, and improved in later phases.
+
+The current baseline flow is:
+
+```text
+Local Markdown/Text Documents
+ ↓
+Document Ingestion
+ ↓
+Word-Based Chunking
+ ↓
+Keyword Retrieval
+ ↓
+Mock LLM Response Generation
+ ↓
+Source-Aware Answer
+```
+
+This baseline is intentionally simple and intentionally insecure. It does not yet enforce role-based retrieval, prompt boundary protection, context sanitization, poisoned document detection, output validation, or audit logging. Those controls are added in later phases after the baseline behavior is easy to understand.
+
+## Implemented Components
+
+| Component | File | Purpose |
+| --- | --- | --- |
+| Document ingestion | `app/ingestion.py` | Loads local `.md` and `.txt` files from the knowledge base. |
+| Chunking | `app/chunking.py` | Splits documents into overlapping word chunks with source metadata. |
+| Retrieval | `app/retrieval.py` | Uses transparent keyword scoring to return relevant chunks. |
+| Mock LLM | `app/mock_llm.py` | Produces a source-aware response without requiring external model APIs. |
+| Pipeline orchestration | `app/rag_pipeline.py` | Connects ingestion, chunking, retrieval, and generation. |
+| CLI runner | `scripts/run_baseline_rag.py` | Runs the baseline RAG pipeline from the terminal. |
+| Tests | `tests/test_baseline_rag.py` | Validates ingestion, chunking, retrieval, and source-aware output. |
+
+## Run Locally
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the baseline RAG pipeline:
+
+```bash
+python scripts/run_baseline_rag.py "What does the policy say about prompt injection?"
+```
+
+Run tests:
+
+```bash
+pytest
+```
+
+## Example Queries
+
+```bash
+python scripts/run_baseline_rag.py "What risks exist in the retrieval layer?"
+python scripts/run_baseline_rag.py "How should AI incidents be investigated?"
+python scripts/run_baseline_rag.py "What does the policy say about access control?"
+```
+
+## Current Security Limitations
+
+The Phase 01 baseline deliberately leaves major risks unresolved:
+
+- No authentication or user role context
+- No document-level access control
+- No trust scoring for retrieved documents
+- No prompt injection detection
+- No separation between trusted instructions and untrusted retrieved content
+- No output validation
+- No audit logging or telemetry
+- No poisoned document detection
+
+These limitations are not accidents. They define the attack surface for the next phases.
+
+---
+
 # Security Domains Covered
 
 ## RAG Security
@@ -128,11 +207,24 @@ aegis-rag-security-lab/
 ├── README.md
 ├── docs/
 ├── app/
+│   ├── __init__.py
+│   ├── ingestion.py
+│   ├── chunking.py
+│   ├── retrieval.py
+│   ├── mock_llm.py
+│   └── rag_pipeline.py
 ├── tests/
+│   ├── __init__.py
+│   └── test_baseline_rag.py
 ├── redteam/
 ├── configs/
 ├── data/
+│   └── knowledge_base/
+│       ├── access_control.md
+│       ├── ai_security_policy.md
+│       └── incident_response.md
 └── scripts/
+    └── run_baseline_rag.py
 ```
 
 ---
@@ -326,7 +418,7 @@ This project is intended to strengthen competency in:
 Current Status:
 
 ```text
-Phase 01 - Baseline RAG Architecture Initialization
+Phase 01 - Baseline RAG Pipeline Implemented
 ```
 
 ---
