@@ -97,6 +97,8 @@ Source-Aware Answer
 
 This baseline is intentionally simple and intentionally insecure. It does not yet enforce role-based retrieval, prompt boundary protection, context sanitization, poisoned document detection, output validation, or audit logging. Those controls are added in later phases after the baseline behavior is easy to understand.
 
+The keyword retrieval baseline is also intentionally limited. It exists to make the retrieval pipeline visible before the project moves into a more realistic semantic retrieval model in Phase 01.5.
+
 ## Implemented Components
 
 | Component | File | Purpose |
@@ -151,6 +153,77 @@ The Phase 01 baseline deliberately leaves major risks unresolved:
 - No poisoned document detection
 
 These limitations are not accidents. They define the attack surface for the next phases.
+
+---
+
+# Phase 01.5 - Semantic Retrieval Upgrade Planned
+
+Phase 01.5 will upgrade the baseline from keyword retrieval to embedding-based semantic retrieval.
+
+This phase is planned but not yet implemented.
+
+The planned semantic retrieval flow is:
+
+```text
+Local Markdown/Text Documents
+ ↓
+Document Ingestion
+ ↓
+Chunking With Source Metadata
+ ↓
+Embedding Generation
+ ↓
+Local Vector Index
+ ↓
+Query Embedding
+ ↓
+Similarity Search
+ ↓
+Retrieved Semantic Context
+ ↓
+Mock or OpenAI-Compatible LLM Response
+ ↓
+Source-Aware Answer
+```
+
+## Purpose
+
+The purpose of Phase 01.5 is to make the RAG system more realistic before formal threat modeling begins.
+
+Keyword retrieval is useful for learning because it is easy to inspect, but real enterprise RAG systems usually rely on semantic search, vector similarity, reranking, hybrid retrieval, or some combination of these techniques.
+
+Phase 01.5 will introduce the core concepts needed to understand realistic RAG behavior:
+
+- Embedding models
+- Vector representations of document chunks
+- Query embeddings
+- Similarity search
+- Local vector indexing
+- Retrieval quality comparison between keyword and semantic search
+- Source-aware semantic responses
+
+## Planned Components
+
+| Planned Component | Purpose |
+| --- | --- |
+| Embedding provider abstraction | Allows the project to swap between local embeddings and API-based embeddings later. |
+| Vector index module | Stores chunk embeddings and supports similarity search. |
+| Semantic retriever | Retrieves chunks based on meaning instead of exact keyword overlap. |
+| Retrieval comparison script | Compares keyword retrieval results against semantic retrieval results. |
+| Additional tests | Validates embedding generation, indexing, and semantic retrieval behavior. |
+
+## New Security Questions Introduced
+
+Semantic retrieval improves realism, but it also introduces new security and evaluation concerns:
+
+- Can poisoned documents manipulate semantic similarity?
+- Can sensitive content be retrieved even when the query does not use exact sensitive keywords?
+- Can semantically similar but incorrect chunks cause misleading answers?
+- How explainable is the retrieval decision compared to keyword matching?
+- Should semantic retrieval be filtered by document classification, user role, or trust score before results reach the LLM?
+- How should retrieval quality be measured before security controls are added?
+
+Phase 02 threat modeling will evaluate both retrieval modes: the transparent keyword baseline and the more realistic embedding-based semantic retriever.
 
 ---
 
@@ -272,6 +345,7 @@ Example workflow:
 ```text
 main
  ├── phase-01-baseline-rag
+ ├── phase-01.5-semantic-retrieval
  ├── phase-02-threat-model
  ├── phase-03-prompt-injection-lab
  ├── phase-04-rag-security-controls
@@ -287,13 +361,22 @@ This structure preserves architectural evolution, implementation history, and se
 
 # Planned Phases
 
-## Phase 01 - Baseline RAG Pipeline
+## Phase 01 - Baseline Keyword RAG Pipeline
 
 - Local document ingestion
-- Chunking
-- Retrieval logic
+- Word-based chunking
+- Keyword retrieval logic
 - Mock LLM integration
 - Source-aware responses
+
+## Phase 01.5 - Embedding-Based Semantic Retrieval
+
+- Embedding generation for document chunks
+- Local vector indexing
+- Query embedding
+- Similarity search
+- Semantic retrieval comparison against keyword retrieval
+- Source-aware semantic responses
 
 ## Phase 02 - Threat Modeling
 
@@ -301,6 +384,7 @@ This structure preserves architectural evolution, implementation history, and se
 - Risk register creation
 - Trust boundary mapping
 - Attack path identification
+- Threat modeling for both keyword retrieval and semantic retrieval
 
 ## Phase 03 - Prompt Injection Lab
 
@@ -359,6 +443,8 @@ The lab explores risks including:
 - Unsafe tool invocation
 - Over-trusting LLM outputs
 - Retrieval manipulation
+- Semantic retrieval manipulation
+- Embedding-based retrieval ambiguity
 - Governance failures
 - Missing observability
 
@@ -378,6 +464,8 @@ Examples of planned controls include:
 - Retrieval source validation
 - Query risk scoring
 - Adversarial evaluation pipelines
+- Retrieval quality evaluation
+- Semantic retrieval filtering
 
 ---
 
@@ -389,7 +477,9 @@ Current and planned technologies include:
 - FastAPI
 - Pytest
 - YAML configuration
+- Keyword retrieval
 - Local vector retrieval
+- Embedding-based semantic search
 - OpenAI-compatible LLM interfaces
 - Structured logging
 - Markdown-based threat modeling
@@ -405,6 +495,7 @@ This project is intended to strengthen competency in:
 - Security-focused system design
 - AI threat modeling
 - RAG pipeline security
+- Semantic retrieval architecture
 - AI governance concepts
 - Security control engineering
 - Operational AI monitoring
@@ -418,7 +509,8 @@ This project is intended to strengthen competency in:
 Current Status:
 
 ```text
-Phase 01 - Baseline RAG Pipeline Implemented
+Phase 01 - Baseline Keyword RAG Pipeline Implemented
+Phase 01.5 - Embedding-Based Semantic Retrieval Planned
 ```
 
 ---
