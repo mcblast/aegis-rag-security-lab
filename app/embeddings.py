@@ -24,16 +24,32 @@ CONCEPT_ALIASES = {
     "attacks": "prompt_injection",
     "bypass": "prompt_injection",
     "hidden": "prompt_injection",
+    "ignore": "prompt_injection",
     "inject": "prompt_injection",
     "injection": "prompt_injection",
     "instruction": "prompt_injection",
     "instructions": "prompt_injection",
     "jailbreak": "prompt_injection",
     "malicious": "prompt_injection",
+    "manipulate": "prompt_injection",
+    "manipulates": "prompt_injection",
+    "manipulated": "prompt_injection",
     "override": "prompt_injection",
+    "policy": "prompt_injection",
     "prompt": "prompt_injection",
+    "rule": "prompt_injection",
+    "rules": "prompt_injection",
     "system": "prompt_injection",
     "authority": "prompt_injection",
+    "content": "indirect_prompt_injection",
+    "email": "indirect_prompt_injection",
+    "emails": "indirect_prompt_injection",
+    "external": "indirect_prompt_injection",
+    "page": "indirect_prompt_injection",
+    "pages": "indirect_prompt_injection",
+    "ticket": "indirect_prompt_injection",
+    "tickets": "indirect_prompt_injection",
+    "web": "indirect_prompt_injection",
     "authorized": "access_control",
     "authorization": "access_control",
     "confidential": "access_control",
@@ -54,6 +70,8 @@ CONCEPT_ALIASES = {
     "incidents": "incident_response",
     "investigate": "incident_response",
     "investigated": "incident_response",
+    "investigator": "incident_response",
+    "investigators": "incident_response",
     "logs": "incident_response",
     "preserve": "incident_response",
     "triage": "incident_response",
@@ -64,6 +82,14 @@ CONCEPT_ALIASES = {
     "documents": "retrieval_security",
     "source": "retrieval_security",
     "sources": "retrieval_security",
+}
+
+# Some higher-level concepts should reinforce nearby parent concepts. For
+# example, indirect prompt injection is still a prompt-injection risk, so a query
+# about external content telling the model to ignore rules should land near the
+# AI security policy instead of drifting toward unrelated retrieval context.
+CONCEPT_BRIDGES = {
+    "indirect_prompt_injection": ("prompt_injection",),
 }
 
 
@@ -104,6 +130,8 @@ class LocalSemanticEmbeddingProvider:
             concept = CONCEPT_ALIASES.get(token)
             if concept:
                 self._add_token(vector, concept, weight=2.5)
+                for bridged_concept in CONCEPT_BRIDGES.get(concept, ()): 
+                    self._add_token(vector, bridged_concept, weight=1.5)
 
         return self._normalize(vector)
 
