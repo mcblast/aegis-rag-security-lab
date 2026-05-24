@@ -31,6 +31,12 @@ def parse_args() -> argparse.Namespace:
         default=3,
         help="Number of chunks to retrieve from each mode.",
     )
+    parser.add_argument(
+        "--minimum-similarity",
+        type=float,
+        default=0.0,
+        help="Minimum semantic similarity required for returned semantic chunks.",
+    )
     return parser.parse_args()
 
 
@@ -40,12 +46,18 @@ def main() -> None:
     chunks = chunk_documents(documents)
 
     keyword_results = retrieve(args.query, chunks, top_k=args.top_k)
-    semantic_results = semantic_retrieve(args.query, chunks, top_k=args.top_k)
+    semantic_results = semantic_retrieve(
+        args.query,
+        chunks,
+        top_k=args.top_k,
+        minimum_similarity=args.minimum_similarity,
+    )
 
     print("\n=== AEGIS RETRIEVAL MODE COMPARISON ===")
     print(f"Query: {args.query}")
     print(f"Documents loaded: {len(documents)}")
     print(f"Chunks indexed: {len(chunks)}")
+    print(f"Semantic minimum similarity: {args.minimum_similarity:.3f}")
 
     print("\n--- Keyword Retrieval ---")
     if not keyword_results:
