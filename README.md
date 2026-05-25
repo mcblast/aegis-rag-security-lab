@@ -622,3 +622,22 @@ This project is intended to strengthen competency in:
 This project is intended for educational, research, and defensive security purposes only.
 
 No real organizational data, credentials, or proprietary systems are used in this repository.
+
+---
+
+## Future Architecture Hardening Notes
+
+As the lab moves beyond the initial retrieval layers, future phases should explicitly evaluate the enterprise security controls that sit around retrieval. Keyword, semantic, and GraphRAG retrieval expose different attack surfaces, but they do not by themselves solve authorization, data lifecycle, privacy, or operational response concerns.
+
+Future hardening work should include:
+
+- Pre-retrieval authorization and allowed-corpus scoping before keyword, semantic, or graph retrieval executes.
+- Post-retrieval context admission checks before any retrieved evidence enters the model prompt.
+- Knowledge base ingestion trust controls, including source approval, document lifecycle status, stale document handling, and index rebuild behavior.
+- Privacy-aware retrieval, redaction, data minimization, and safe logging for sensitive query and document content.
+- Multi-tenant isolation for document chunks, vector indexes, metadata filters, graph nodes, and graph edges.
+- Model, embedding provider, dependency, and third-party service supply-chain risk assessment.
+- Concrete adversarial evaluation metrics for poisoned retrieval, unauthorized retrieval, unsafe output, stale-source selection, and graph manipulation.
+- AI incident response workflows for detecting poisoned knowledge sources, preserving retrieval traces, quarantining affected content, and rebuilding impacted indexes or graph relationships.
+
+These items should be treated as future architecture hardening targets, not current implementation claims.
