@@ -17,11 +17,11 @@ The primary objective is to develop practical understanding of modern AI securit
 ```text
 Phase 01    - Baseline Keyword RAG Pipeline Implemented
 Phase 01.5  - Semantic Retrieval Pipeline Implemented
-Phase 01.75 - Local GraphRAG Retrieval Planned
+Phase 01.75 - Local GraphRAG Retrieval Implemented on phase branch
 Phase 02    - Threat Modeling Planned
 ```
 
-Current `main` includes both the transparent keyword retrieval baseline and the Phase 01.5 semantic retrieval path. Phase 01.75 is planned as the next retrieval-architecture expansion before formal threat modeling begins.
+Current `main` includes both the transparent keyword retrieval baseline and the Phase 01.5 semantic retrieval path. The `phase-01.75-local-graphrag` branch adds the next retrieval-architecture expansion: a local, deterministic GraphRAG path for relationship-aware retrieval before formal threat modeling begins.
 
 ---
 
@@ -185,37 +185,21 @@ This is not a production embedding model. It is a local, dependency-free scaffol
 
 The provider combines hashed token buckets with concept normalization for prompt injection, indirect prompt injection, access control, retrieval security, and incident response concepts. Future phases can replace this provider with a real embedding backend while preserving the retrieval pipeline contract.
 
-### Retrieval Tuning
-
-Initial testing showed that semantic retrieval can return noisy results when `top_k` is high and the similarity threshold is too low. The comparison CLI supports semantic thresholding:
-
-```bash
-PYTHONPATH=. python scripts/compare_retrieval_modes.py "What happens when external content tells the model to ignore its rules?" --top-k 3 --minimum-similarity 0.35
-```
-
-The local embedding provider was also tuned so indirect prompt-injection language such as `external content`, `ignore`, and `rules` maps more strongly toward the AI security policy document.
-
-For full Phase 01.5 architecture notes, see:
-
-```text
-docs/phase-01-5-semantic-retrieval.md
-```
-
 ---
 
-## Phase 01.75 - Local GraphRAG Retrieval Planned
+## Phase 01.75 - Local GraphRAG Retrieval
 
-Phase 01.75 will add a lightweight local GraphRAG retrieval path after semantic retrieval and before formal threat modeling.
+Phase 01.75 adds a lightweight local GraphRAG retrieval path after semantic retrieval and before formal threat modeling.
 
 The goal is not to add a graph database for its own sake. The goal is to introduce relationship-aware retrieval so the project can compare three retrieval paradigms:
 
 ```text
-Keyword retrieval   → What exact terms matched?
-Semantic retrieval  → What meaning is closest?
-GraphRAG retrieval  → What entities, concepts, and relationships connect the answer?
+Keyword retrieval   -> What exact terms matched?
+Semantic retrieval  -> What meaning is closest?
+GraphRAG retrieval  -> What concepts and relationships connect the answer?
 ```
 
-The planned GraphRAG flow is:
+The GraphRAG flow is:
 
 ```text
 Local Markdown/Text Documents
@@ -224,7 +208,7 @@ Document Ingestion
  ↓
 Chunking With Source Metadata
  ↓
-Concept / Entity Mapping
+Rules-Based Concept Matching
  ↓
 Local Knowledge Graph Construction
  ↓
@@ -237,34 +221,39 @@ Mock LLM Response Generation
 Source-Aware Answer
 ```
 
-### Planned Scope
+### Scope
 
-Phase 01.75 will remain local, deterministic, and inspectable.
+Phase 01.75 remains local, deterministic, and inspectable.
 
-The first version should avoid external graph databases, LLM-based extraction, and heavy GraphRAG frameworks. A small manually defined or rules-based graph is enough to study the architecture and its security implications.
+The first version avoids external graph databases, LLM-based extraction, and heavy GraphRAG frameworks. A small manually defined and rules-based graph is enough to study the architecture and its security implications.
 
-### Planned Components
+### Implemented Components
 
-| Planned Component | Purpose |
-| --- | --- |
-| Graph model module | Defines local graph nodes, edges, labels, and source metadata. |
-| Graph builder | Builds a lightweight concept graph from the local knowledge base. |
-| Graph retriever | Traverses concept relationships to find relevant source chunks. |
-| GraphRAG pipeline | Runs graph retrieval beside keyword and semantic retrieval. |
-| GraphRAG CLI | Runs local GraphRAG queries from the terminal. |
-| All-mode comparison CLI | Compares keyword, semantic, and graph retrieval outputs. |
-| Graph retrieval tests | Validates graph construction, traversal, and source-aware retrieval. |
-| Phase documentation | Documents GraphRAG architecture, limitations, and security questions. |
+| Component | File | Purpose |
+| --- | --- | --- |
+| Graph model module | `app/graph_model.py` | Defines local graph nodes, edges, labels, traversal paths, and chunk links. |
+| Graph builder | `app/graph_builder.py` | Builds a lightweight concept graph from explicit concepts, aliases, relationships, and local chunks. |
+| Graph retriever | `app/graph_retrieval.py` | Traverses concept relationships to find relevant source chunks. |
+| GraphRAG pipeline | `app/graphrag_pipeline.py` | Runs graph retrieval beside keyword and semantic retrieval. |
+| GraphRAG CLI | `scripts/run_graphrag.py` | Runs local GraphRAG queries from the terminal. |
+| All-mode comparison CLI | `scripts/compare_all_retrieval_modes.py` | Compares keyword, semantic, and GraphRAG retrieval outputs. |
+| Graph retrieval tests | `tests/test_graphrag_retrieval.py` | Validates graph construction, traversal, source-aware retrieval, and pipeline behavior. |
+| Phase documentation | `docs/phase-01-75-local-graphrag.md` | Documents GraphRAG architecture, limitations, and security questions. |
 
 ### Example Relationships
 
 ```text
 prompt_injection          --manipulates--> model_behavior
 indirect_prompt_injection --enters_through--> external_content
+external_content          --flows_into--> retrieval_layer
+retrieval_layer           --selects--> retrieved_context
 retrieval_layer           --can_expose--> confidential_source_material
 access_control_failure    --causes--> sensitive_data_leakage
+sensitive_data_leakage    --involves--> confidential_source_material
 incident_response         --preserves--> retrieved_context
 incident_response         --preserves--> model_responses
+graph_traversal           --connects--> retrieved_context
+graph_traversal           --can_surface--> confidential_source_material
 ```
 
 ### New Security Questions Introduced
@@ -272,7 +261,7 @@ incident_response         --preserves--> model_responses
 GraphRAG introduces additional security and governance questions:
 
 - Can a poisoned document create malicious graph relationships?
-- Can incorrect entity extraction distort retrieval behavior?
+- Can incorrect entity or concept extraction distort retrieval behavior?
 - Can graph traversal expose sensitive connected concepts?
 - Should graph nodes and edges have trust scores?
 - Should graph nodes inherit document classification labels?
@@ -309,16 +298,28 @@ Run the semantic RAG pipeline:
 PYTHONPATH=. python scripts/run_semantic_rag.py "How do hidden instructions affect AI systems?"
 ```
 
+Run the GraphRAG pipeline:
+
+```bash
+PYTHONPATH=. python scripts/run_graphrag.py "How can retrieval expose confidential source material?"
+```
+
 Compare keyword and semantic retrieval:
 
 ```bash
 PYTHONPATH=. python scripts/compare_retrieval_modes.py "How can documents manipulate model behavior?"
 ```
 
+Compare keyword, semantic, and GraphRAG retrieval:
+
+```bash
+PYTHONPATH=. python scripts/compare_all_retrieval_modes.py "How can documents manipulate model behavior?"
+```
+
 Compare retrieval modes with semantic thresholding:
 
 ```bash
-PYTHONPATH=. python scripts/compare_retrieval_modes.py "Who is allowed to see private knowledge sources?" --top-k 3 --minimum-similarity 0.45
+PYTHONPATH=. python scripts/compare_all_retrieval_modes.py "Who is allowed to see private knowledge sources?" --top-k 3 --minimum-similarity 0.45 --max-depth 2
 ```
 
 ---
@@ -330,12 +331,15 @@ The current implementation deliberately leaves major security controls unresolve
 - No authentication or user role context
 - No document-level access control
 - No trust scoring for retrieved documents
+- No graph node trust scoring
+- No graph edge trust scoring
 - No prompt injection detection
 - No separation between trusted instructions and untrusted retrieved content
 - No context sanitization
 - No output validation
 - No audit logging or telemetry
 - No poisoned document detection
+- No poisoned graph relationship detection
 - No policy enforcement engine
 
 These limitations are not accidents. They define the attack surface for Phase 02 threat modeling and later defensive phases.
@@ -349,7 +353,7 @@ These limitations are not accidents. They define the attack surface for Phase 02
 - Retrieval pipeline security
 - Keyword retrieval behavior
 - Semantic retrieval behavior
-- Planned GraphRAG retrieval behavior
+- GraphRAG retrieval behavior
 - Context boundary enforcement
 - Retrieval access control
 - Source trust validation
@@ -364,7 +368,7 @@ These limitations are not accidents. They define the attack surface for Phase 02
 - System prompt extraction attempts
 - Retrieval-based manipulation
 - Semantic retrieval manipulation
-- Planned graph relationship manipulation
+- Graph relationship manipulation
 
 ### AI Governance
 
@@ -399,7 +403,8 @@ aegis-rag-security-lab/
 │
 ├── README.md
 ├── docs/
-│   └── phase-01-5-semantic-retrieval.md
+│   ├── phase-01-5-semantic-retrieval.md
+│   └── phase-01-75-local-graphrag.md
 ├── app/
 │   ├── __init__.py
 │   ├── ingestion.py
@@ -408,13 +413,18 @@ aegis-rag-security-lab/
 │   ├── embeddings.py
 │   ├── vector_index.py
 │   ├── semantic_retrieval.py
+│   ├── graph_model.py
+│   ├── graph_builder.py
+│   ├── graph_retrieval.py
 │   ├── mock_llm.py
 │   ├── rag_pipeline.py
-│   └── semantic_rag_pipeline.py
+│   ├── semantic_rag_pipeline.py
+│   └── graphrag_pipeline.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_baseline_rag.py
-│   └── test_semantic_retrieval.py
+│   ├── test_semantic_retrieval.py
+│   └── test_graphrag_retrieval.py
 ├── redteam/
 ├── configs/
 ├── data/
@@ -425,7 +435,9 @@ aegis-rag-security-lab/
 └── scripts/
     ├── run_baseline_rag.py
     ├── run_semantic_rag.py
-    └── compare_retrieval_modes.py
+    ├── run_graphrag.py
+    ├── compare_retrieval_modes.py
+    └── compare_all_retrieval_modes.py
 ```
 
 ---
@@ -442,7 +454,7 @@ Example workflow:
 main
  ├── phase-01-baseline-rag
  ├── phase-01-5-semantic-retrieval
- ├── phase-01-75-graphrag
+ ├── phase-01.75-local-graphrag
  ├── phase-02-threat-model
  ├── phase-03-prompt-injection-lab
  ├── phase-04-rag-security-controls
