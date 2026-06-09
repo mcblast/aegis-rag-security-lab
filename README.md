@@ -17,11 +17,13 @@ The primary objective is to develop practical understanding of modern AI securit
 ```text
 Phase 01    - Baseline Keyword RAG Pipeline Implemented
 Phase 01.5  - Semantic Retrieval Pipeline Implemented
-Phase 01.75 - Local GraphRAG Retrieval Implemented on phase branch
-Phase 02    - Threat Modeling Planned
+Phase 01.75 - Local GraphRAG Retrieval Implemented and merged into main
+Phase 02    - Threat Modeling In Progress
 ```
 
-Current `main` includes both the transparent keyword retrieval baseline and the Phase 01.5 semantic retrieval path. The `phase-01.75-local-graphrag` branch adds the next retrieval-architecture expansion: a local, deterministic GraphRAG path for relationship-aware retrieval before formal threat modeling begins.
+Current `main` includes the transparent keyword retrieval baseline, the Phase 01.5 semantic retrieval path, and the Phase 01.75 local GraphRAG retrieval path.
+
+The `phase-02-threat-model` branch adds the first formal threat-modeling layer for the project. It documents assets, trust boundaries, attack paths, an initial risk register, and a future control backlog before defensive controls are implemented.
 
 ---
 
@@ -268,7 +270,26 @@ GraphRAG introduces additional security and governance questions:
 - Can attackers manipulate relationship paths instead of only text chunks?
 - How should graph-based retrieval be evaluated against keyword and semantic retrieval?
 
-Phase 02 threat modeling will evaluate keyword retrieval, semantic retrieval, and GraphRAG retrieval together.
+Phase 02 threat modeling evaluates keyword retrieval, semantic retrieval, and GraphRAG retrieval together.
+
+---
+
+## Phase 02 - Threat Modeling
+
+Phase 02 documents the initial threat model for the current retrieval architecture before security controls are implemented.
+
+The Phase 02 documentation includes:
+
+| Document | Purpose |
+| --- | --- |
+| `docs/phase-02-threat-model.md` | Main Phase 02 overview, scope, data flows, threat surface summary, and acceptance criteria. |
+| `docs/threat-model/assets.md` | Asset inventory for user inputs, knowledge base content, chunks, retrieval artifacts, graph artifacts, outputs, and future operational evidence. |
+| `docs/threat-model/trust-boundaries.md` | Trust boundary map across query handling, ingestion, chunking, retrieval, graph traversal, context generation, and output. |
+| `docs/threat-model/attack-paths.md` | Initial defensive attack-path catalog for keyword, semantic, GraphRAG, poisoning, prompt injection, and observability risks. |
+| `docs/threat-model/risk-register.md` | Initial risk register mapping threats to affected layers, retrieval modes, attack paths, impact, likelihood, and future controls. |
+| `docs/threat-model/control-backlog.md` | Future security control backlog derived from the threat model. |
+
+Phase 02 does **not** implement defensive controls. It defines why later controls are needed.
 
 ---
 
@@ -404,7 +425,14 @@ aegis-rag-security-lab/
 ├── README.md
 ├── docs/
 │   ├── phase-01-5-semantic-retrieval.md
-│   └── phase-01-75-local-graphrag.md
+│   ├── phase-01-75-local-graphrag.md
+│   ├── phase-02-threat-model.md
+│   └── threat-model/
+│       ├── assets.md
+│       ├── trust-boundaries.md
+│       ├── attack-paths.md
+│       ├── risk-register.md
+│       └── control-backlog.md
 ├── app/
 │   ├── __init__.py
 │   ├── ingestion.py
@@ -497,9 +525,11 @@ main
 ### Phase 02 - Threat Modeling
 
 - AI threat surface analysis
-- Risk register creation
+- Asset inventory
 - Trust boundary mapping
 - Attack path identification
+- Risk register creation
+- Future control backlog
 - Threat modeling for keyword, semantic, and GraphRAG retrieval
 
 ### Phase 03 - Prompt Injection Lab
