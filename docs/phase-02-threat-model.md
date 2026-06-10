@@ -262,9 +262,13 @@ This phase does not add:
 
 Those controls belong in later implementation phases after the threat model defines why each control is needed.
 
-## Acceptance Criteria
+## Threat-Modeling Roadmap Completion Criteria
 
-Phase 02 is complete when:
+The Phase 02 threat-modeling roadmap is complete when the project gives builders and implementers a clear security blueprint for later attack simulation, control implementation, and validation work.
+
+Completion means the roadmap identifies what must be protected, where trust changes occur, how the current retrieval architecture can fail, which risks matter most, and where future controls should be placed.
+
+Required roadmap artifacts:
 
 - The system assets are documented.
 - Trust boundaries are documented.
