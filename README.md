@@ -232,14 +232,14 @@ The Phase 02 documentation includes:
 
 | Document | Purpose |
 | --- | --- |
-| [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md) | Main Phase 02 overview, scope, data flows, threat surface summary, threat-to-boundary mapping, attacker personas, abuse cases, control placement diagram, Phase 3 handoff, and acceptance criteria. |
+| [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md) | Main Phase 02 overview, scope, data flows, threat surface summary, threat-to-boundary mapping, attacker personas, abuse cases, control placement diagram, Phase 3 handoff, and roadmap completion criteria. |
 | [`docs/threat-model/assets.md`](docs/threat-model/assets.md) | Asset inventory for user inputs, knowledge base content, chunks, retrieval artifacts, graph artifacts, outputs, and future operational evidence. |
 | [`docs/threat-model/trust-boundaries.md`](docs/threat-model/trust-boundaries.md) | Trust boundary map across query handling, ingestion, chunking, retrieval, graph traversal, context generation, and output. |
 | [`docs/threat-model/attack-paths.md`](docs/threat-model/attack-paths.md) | Initial defensive attack-path catalog for keyword, semantic, GraphRAG, poisoning, prompt injection, and observability risks. |
 | [`docs/threat-model/risk-register.md`](docs/threat-model/risk-register.md) | Initial risk register mapping threats to affected layers, retrieval modes, attack paths, impact, likelihood, and future controls. |
 | [`docs/threat-model/control-backlog.md`](docs/threat-model/control-backlog.md) | Future security control backlog derived from the threat model. |
 
-Phase 02 does **not** implement defensive controls. It defines why later controls are needed.
+Phase 02 does **not** implement defensive controls. It defines why later controls are needed and gives future builders a roadmap for attack simulation, defensive control placement, and validation work.
 
 ### Phase 02 Control Placement Summary
 
@@ -262,11 +262,11 @@ Telemetry
 
 ## Next Implementation Steps
 
-### Step 1 - Finish Phase 02 Documentation Polish
+### Step 1 - Phase 02 Documentation Polish Completed
 
-Complete the documentation polish layer for Phase 02 by adding traceability between the threat-model artifacts.
+The Phase 02 documentation polish layer is complete. It now provides the roadmap artifacts needed by future builders and implementers before moving into attack simulation and defensive control implementation.
 
-Deliverables:
+Completed deliverables:
 
 - Threat-to-boundary mapping in [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md)
 - Attacker personas in [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md)
