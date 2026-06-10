@@ -262,16 +262,20 @@ This phase does not add:
 
 Those controls belong in later implementation phases after the threat model defines why each control is needed.
 
-## Acceptance Criteria
+## Threat-Modeling Roadmap Completion Criteria
 
-Phase 02 is complete when:
+The Phase 02 threat-modeling roadmap is complete when the project gives builders and implementers a clear security blueprint for later attack simulation, control implementation, and validation work.
 
-- The system assets are documented.
-- Trust boundaries are documented.
-- Initial data flows are documented.
-- Retrieval-specific attack paths are documented.
+Completion means the roadmap identifies what must be protected, where trust changes occur, how the current retrieval architecture can fail, which risks matter most, and where future controls should be placed.
+
+Required roadmap artifacts:
+
+- System assets are documented so builders know what data, metadata, retrieval artifacts, graph artifacts, outputs, and operational evidence require protection.
+- Trust boundaries are documented so implementers know where user input, documents, chunks, retrieval results, graph paths, context, and output cross security assumptions.
+- Initial data flows are documented so later phases can place controls at the correct points in the RAG pipeline.
+- Retrieval-specific attack paths are documented for keyword, semantic, and GraphRAG behavior.
 - Threat-to-boundary mapping exists across attack paths, trust boundaries, risks, and controls.
-- Attacker personas and abuse cases are documented.
+- Attacker personas and abuse cases are documented so later attack labs can test realistic misuse patterns.
 - A risk register exists for keyword, semantic, and GraphRAG retrieval risks.
 - A future control backlog maps risks to planned defensive controls.
-- The README accurately reflects Phase 02 status and the next planned implementation steps.
+- The README reflects the Phase 02 roadmap and the next planned implementation steps for Phase 03 and Phase 04.
