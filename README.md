@@ -6,7 +6,7 @@ Aegis RAG Security Lab is a hands-on AI security architecture project focused on
 
 The project simulates the lifecycle of securing enterprise AI applications that integrate Large Language Models (LLMs), document retrieval pipelines, user context, policy enforcement mechanisms, and observability controls.
 
-This repository is intentionally structured as a phased security engineering and architecture lab. Historical phase branches are kept as checkpoints so the project’s evolution can be reviewed over time, while `main` represents the current integrated project state.
+This repository is intentionally structured as a phased security engineering and architecture lab. Historical phase branches are kept as checkpoints so the project's evolution can be reviewed over time, while `main` represents the current integrated project state.
 
 The primary objective is to develop practical understanding of modern AI security concepts from both an engineering and architectural perspective.
 
@@ -23,7 +23,7 @@ Phase 02    - Threat Modeling In Progress
 
 Current `main` includes the transparent keyword retrieval baseline, the Phase 01.5 semantic retrieval path, and the Phase 01.75 local GraphRAG retrieval path.
 
-The `phase-02-threat-model` branch adds the first formal threat-modeling layer for the project. It documents assets, trust boundaries, attack paths, an initial risk register, and a future control backlog before defensive controls are implemented.
+The `phase-02-threat-model` branch adds the first formal threat-modeling layer for the project. It documents assets, trust boundaries, attack paths, an initial risk register, attacker personas, abuse cases, threat-to-boundary mapping, a control placement diagram, and a future control backlog before defensive controls are implemented.
 
 ---
 
@@ -94,11 +94,11 @@ Response
 
 ---
 
-## Phase 01 - Baseline Keyword RAG Pipeline
+## Implemented Retrieval Phases
+
+### Phase 01 - Baseline Keyword RAG Pipeline
 
 Phase 01 implements a minimal local RAG pipeline that can be studied, tested, attacked, and improved in later phases.
-
-The baseline flow is:
 
 ```text
 Local Markdown/Text Documents
@@ -114,11 +114,7 @@ Mock LLM Response Generation
 Source-Aware Answer
 ```
 
-This baseline is intentionally simple and intentionally insecure. It does not yet enforce role-based retrieval, prompt boundary protection, context sanitization, poisoned document detection, output validation, or audit logging. Those controls are added in later phases after the baseline behavior is easy to understand.
-
-The keyword retrieval baseline is intentionally limited. It exists to make retrieval behavior visible before comparing it against the more realistic semantic retrieval path introduced in Phase 01.5.
-
-### Implemented Components
+Implemented components:
 
 | Component | File | Purpose |
 | --- | --- | --- |
@@ -130,15 +126,9 @@ The keyword retrieval baseline is intentionally limited. It exists to make retri
 | CLI runner | `scripts/run_baseline_rag.py` | Runs the baseline RAG pipeline from the terminal. |
 | Tests | `tests/test_baseline_rag.py` | Validates ingestion, chunking, retrieval, and source-aware output. |
 
----
+### Phase 01.5 - Semantic Retrieval Pipeline
 
-## Phase 01.5 - Semantic Retrieval Pipeline
-
-Phase 01.5 adds a parallel semantic retrieval path beside the keyword baseline.
-
-It does **not** replace the Phase 01 keyword retriever. Instead, it allows keyword and semantic retrieval to be compared side by side before threat modeling and defensive controls are introduced.
-
-The semantic flow is:
+Phase 01.5 adds a parallel semantic retrieval path beside the keyword baseline. It does not replace keyword retrieval; it allows keyword and semantic retrieval to be compared side by side before threat modeling and defensive controls are introduced.
 
 ```text
 Local Markdown/Text Documents
@@ -162,7 +152,7 @@ Mock LLM Response Generation
 Source-Aware Answer
 ```
 
-### Implemented Components
+Implemented components:
 
 | Component | File | Purpose |
 | --- | --- | --- |
@@ -173,35 +163,19 @@ Source-Aware Answer
 | Semantic CLI | `scripts/run_semantic_rag.py` | Runs the semantic RAG pipeline from the terminal. |
 | Retrieval comparison CLI | `scripts/compare_retrieval_modes.py` | Compares keyword and semantic retrieval for the same query. |
 | Semantic tests | `tests/test_semantic_retrieval.py` | Validates embeddings, vector search, semantic retrieval, and pipeline behavior. |
-| Phase documentation | `docs/phase-01-5-semantic-retrieval.md` | Documents semantic retrieval architecture, tuning findings, and security questions. |
+| Phase documentation | [`docs/phase-01-5-semantic-retrieval.md`](docs/phase-01-5-semantic-retrieval.md) | Documents semantic retrieval architecture, tuning findings, and security questions. |
 
-### Local Embedding Strategy
+Phase 01.5 uses a deterministic local embedding provider named `local-semantic-hash-v1`. This is not a production embedding model; it is a local, dependency-free scaffold that gives the project an embedding-shaped interface without requiring API keys, model downloads, FAISS, pgvector, or a managed vector database.
 
-Phase 01.5 uses a deterministic local embedding provider named:
-
-```text
-local-semantic-hash-v1
-```
-
-This is not a production embedding model. It is a local, dependency-free scaffold that gives the project an embedding-shaped interface without requiring API keys, model downloads, FAISS, pgvector, or a managed vector database.
-
-The provider combines hashed token buckets with concept normalization for prompt injection, indirect prompt injection, access control, retrieval security, and incident response concepts. Future phases can replace this provider with a real embedding backend while preserving the retrieval pipeline contract.
-
----
-
-## Phase 01.75 - Local GraphRAG Retrieval
+### Phase 01.75 - Local GraphRAG Retrieval
 
 Phase 01.75 adds a lightweight local GraphRAG retrieval path after semantic retrieval and before formal threat modeling.
-
-The goal is not to add a graph database for its own sake. The goal is to introduce relationship-aware retrieval so the project can compare three retrieval paradigms:
 
 ```text
 Keyword retrieval   -> What exact terms matched?
 Semantic retrieval  -> What meaning is closest?
 GraphRAG retrieval  -> What concepts and relationships connect the answer?
 ```
-
-The GraphRAG flow is:
 
 ```text
 Local Markdown/Text Documents
@@ -223,13 +197,7 @@ Mock LLM Response Generation
 Source-Aware Answer
 ```
 
-### Scope
-
-Phase 01.75 remains local, deterministic, and inspectable.
-
-The first version avoids external graph databases, LLM-based extraction, and heavy GraphRAG frameworks. A small manually defined and rules-based graph is enough to study the architecture and its security implications.
-
-### Implemented Components
+Implemented components:
 
 | Component | File | Purpose |
 | --- | --- | --- |
@@ -240,25 +208,7 @@ The first version avoids external graph databases, LLM-based extraction, and hea
 | GraphRAG CLI | `scripts/run_graphrag.py` | Runs local GraphRAG queries from the terminal. |
 | All-mode comparison CLI | `scripts/compare_all_retrieval_modes.py` | Compares keyword, semantic, and GraphRAG retrieval outputs. |
 | Graph retrieval tests | `tests/test_graphrag_retrieval.py` | Validates graph construction, traversal, source-aware retrieval, and pipeline behavior. |
-| Phase documentation | `docs/phase-01-75-local-graphrag.md` | Documents GraphRAG architecture, limitations, and security questions. |
-
-### Example Relationships
-
-```text
-prompt_injection          --manipulates--> model_behavior
-indirect_prompt_injection --enters_through--> external_content
-external_content          --flows_into--> retrieval_layer
-retrieval_layer           --selects--> retrieved_context
-retrieval_layer           --can_expose--> confidential_source_material
-access_control_failure    --causes--> sensitive_data_leakage
-sensitive_data_leakage    --involves--> confidential_source_material
-incident_response         --preserves--> retrieved_context
-incident_response         --preserves--> model_responses
-graph_traversal           --connects--> retrieved_context
-graph_traversal           --can_surface--> confidential_source_material
-```
-
-### New Security Questions Introduced
+| Phase documentation | [`docs/phase-01-75-local-graphrag.md`](docs/phase-01-75-local-graphrag.md) | Documents GraphRAG architecture, limitations, and security questions. |
 
 GraphRAG introduces additional security and governance questions:
 
@@ -282,14 +232,89 @@ The Phase 02 documentation includes:
 
 | Document | Purpose |
 | --- | --- |
-| `docs/phase-02-threat-model.md` | Main Phase 02 overview, scope, data flows, threat surface summary, and acceptance criteria. |
-| `docs/threat-model/assets.md` | Asset inventory for user inputs, knowledge base content, chunks, retrieval artifacts, graph artifacts, outputs, and future operational evidence. |
-| `docs/threat-model/trust-boundaries.md` | Trust boundary map across query handling, ingestion, chunking, retrieval, graph traversal, context generation, and output. |
-| `docs/threat-model/attack-paths.md` | Initial defensive attack-path catalog for keyword, semantic, GraphRAG, poisoning, prompt injection, and observability risks. |
-| `docs/threat-model/risk-register.md` | Initial risk register mapping threats to affected layers, retrieval modes, attack paths, impact, likelihood, and future controls. |
-| `docs/threat-model/control-backlog.md` | Future security control backlog derived from the threat model. |
+| [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md) | Main Phase 02 overview, scope, data flows, threat surface summary, threat-to-boundary mapping, attacker personas, abuse cases, control placement diagram, Phase 3 handoff, and acceptance criteria. |
+| [`docs/threat-model/assets.md`](docs/threat-model/assets.md) | Asset inventory for user inputs, knowledge base content, chunks, retrieval artifacts, graph artifacts, outputs, and future operational evidence. |
+| [`docs/threat-model/trust-boundaries.md`](docs/threat-model/trust-boundaries.md) | Trust boundary map across query handling, ingestion, chunking, retrieval, graph traversal, context generation, and output. |
+| [`docs/threat-model/attack-paths.md`](docs/threat-model/attack-paths.md) | Initial defensive attack-path catalog for keyword, semantic, GraphRAG, poisoning, prompt injection, and observability risks. |
+| [`docs/threat-model/risk-register.md`](docs/threat-model/risk-register.md) | Initial risk register mapping threats to affected layers, retrieval modes, attack paths, impact, likelihood, and future controls. |
+| [`docs/threat-model/control-backlog.md`](docs/threat-model/control-backlog.md) | Future security control backlog derived from the threat model. |
 
 Phase 02 does **not** implement defensive controls. It defines why later controls are needed.
+
+### Phase 02 Control Placement Summary
+
+```text
+Query Handling
+  -> pre-retrieval authorization and allowed-corpus scoping
+Retrieval Layer
+  -> document classification, metadata filtering, semantic thresholds, graph traversal policy
+Context Admission
+  -> source trust scoring and retrieved context sanitization
+Prompt Construction
+  -> prompt boundary enforcement
+Output
+  -> output validation
+Telemetry
+  -> structured retrieval logging and incident traceability
+```
+
+---
+
+## Next Implementation Steps
+
+### Step 1 - Finish Phase 02 Documentation Polish
+
+Complete the documentation polish layer for Phase 02 by adding traceability between the threat-model artifacts.
+
+Deliverables:
+
+- Threat-to-boundary mapping in [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md)
+- Attacker personas in [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md)
+- Abuse cases in [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md)
+- Control placement diagram in [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md)
+- Phase 3 handoff section in [`docs/phase-02-threat-model.md`](docs/phase-02-threat-model.md)
+- Clickable cross-document links across Phase 02 documentation where appropriate
+
+### Step 2 - Implement Phase 03 Prompt Injection and Poisoned Retrieval Lab
+
+Phase 03 should demonstrate the vulnerable behavior identified in Phase 02 before defensive controls are added.
+
+Planned work:
+
+- Add adversarial knowledge base documents that model poisoned source material and indirect prompt injection content.
+- Add prompt-injection and retrieval-poisoning scenarios for keyword, semantic, and GraphRAG retrieval.
+- Add tests or scripts that show unsafe retrieved context entering the mock generation layer.
+- Compare how each retrieval mode surfaces poisoned or sensitive context differently.
+- Preserve expected vulnerable behavior so Phase 04 controls can prove measurable risk reduction.
+
+Primary Phase 02 links:
+
+- [`AP-004: Poisoned Source Document Retrieval`](docs/threat-model/attack-paths.md#ap-004-poisoned-source-document-retrieval)
+- [`AP-005: Indirect Prompt Injection Through Retrieved Content`](docs/threat-model/attack-paths.md#ap-005-indirect-prompt-injection-through-retrieved-content)
+- [`PI-TM-001`](docs/threat-model/risk-register.md#pi-tm-001-retrieved-content-contains-indirect-prompt-injection)
+- [`CTRL-007: Prompt Boundary Enforcement`](docs/threat-model/control-backlog.md#ctrl-007-prompt-boundary-enforcement)
+
+### Step 3 - Implement Phase 04 Initial RAG Security Controls
+
+Phase 04 should begin hardening the retrieval pipeline using the control backlog created in Phase 02 and the attack evidence created in Phase 03.
+
+Planned work:
+
+- Add document classification metadata for knowledge base sources and chunks.
+- Add allowed-corpus scoping before keyword, semantic, or GraphRAG retrieval executes.
+- Add metadata-filtered semantic retrieval so unauthorized chunks are filtered before similarity ranking.
+- Add source trust labels and initial context admission checks.
+- Add prompt boundary enforcement so retrieved content is treated as evidence, not instructions.
+- Add initial output validation for unsafe disclosure, unsupported claims, and missing citations.
+- Add graph node classification, graph edge trust scoring, and traversal policy checks for GraphRAG.
+
+Primary Phase 02 links:
+
+- [`CTRL-001: Pre-Retrieval Authorization`](docs/threat-model/control-backlog.md#ctrl-001-pre-retrieval-authorization)
+- [`CTRL-002: Document Classification`](docs/threat-model/control-backlog.md#ctrl-002-document-classification)
+- [`CTRL-004: Metadata-Filtered Vector Search`](docs/threat-model/control-backlog.md#ctrl-004-metadata-filtered-vector-search)
+- [`CTRL-007: Prompt Boundary Enforcement`](docs/threat-model/control-backlog.md#ctrl-007-prompt-boundary-enforcement)
+- [`CTRL-012: Graph Traversal Policy Checks`](docs/threat-model/control-backlog.md#ctrl-012-graph-traversal-policy-checks)
 
 ---
 
@@ -367,56 +392,6 @@ These limitations are not accidents. They define the attack surface for Phase 02
 
 ---
 
-## Security Domains Covered
-
-### RAG Security
-
-- Retrieval pipeline security
-- Keyword retrieval behavior
-- Semantic retrieval behavior
-- GraphRAG retrieval behavior
-- Context boundary enforcement
-- Retrieval access control
-- Source trust validation
-- Sensitive data exposure prevention
-- Citation enforcement
-
-### Prompt Injection
-
-- Direct prompt injection
-- Indirect prompt injection
-- Instruction override attacks
-- System prompt extraction attempts
-- Retrieval-based manipulation
-- Semantic retrieval manipulation
-- Graph relationship manipulation
-
-### AI Governance
-
-- Risk classification
-- Policy enforcement
-- Human approval workflows
-- Security control mapping
-- Auditability and traceability
-
-### AI Monitoring & Evaluation
-
-- Security telemetry
-- Adversarial evaluation
-- Risk scoring
-- Attack success tracking
-- Unsafe output detection
-
-### Enterprise AI Architecture
-
-- Layered security controls
-- Separation of concerns
-- Policy-driven design
-- Configurable security boundaries
-- Operational observability
-
----
-
 ## Repository Structure
 
 ```text
@@ -434,7 +409,6 @@ aegis-rag-security-lab/
 │       ├── risk-register.md
 │       └── control-backlog.md
 ├── app/
-│   ├── __init__.py
 │   ├── ingestion.py
 │   ├── chunking.py
 │   ├── retrieval.py
@@ -449,7 +423,6 @@ aegis-rag-security-lab/
 │   ├── semantic_rag_pipeline.py
 │   └── graphrag_pipeline.py
 ├── tests/
-│   ├── __init__.py
 │   ├── test_baseline_rag.py
 │   ├── test_semantic_retrieval.py
 │   └── test_graphrag_retrieval.py
@@ -457,9 +430,6 @@ aegis-rag-security-lab/
 ├── configs/
 ├── data/
 │   └── knowledge_base/
-│       ├── access_control.md
-│       ├── ai_security_policy.md
-│       └── incident_response.md
 └── scripts/
     ├── run_baseline_rag.py
     ├── run_semantic_rag.py
@@ -475,8 +445,6 @@ aegis-rag-security-lab/
 The project is developed in isolated security phases using dedicated Git branches.
 
 Historical phase branches are kept as architectural checkpoints. They show how the project evolved over time. `main` represents the current integrated system state.
-
-Example workflow:
 
 ```text
 main
@@ -528,9 +496,12 @@ main
 - Asset inventory
 - Trust boundary mapping
 - Attack path identification
+- Threat-to-boundary mapping
+- Attacker personas and abuse cases
+- Control placement diagram
 - Risk register creation
 - Future control backlog
-- Threat modeling for keyword, semantic, and GraphRAG retrieval
+- Phase 3 handoff planning
 
 ### Phase 03 - Prompt Injection Lab
 
