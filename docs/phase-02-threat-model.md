@@ -270,12 +270,12 @@ Completion means the roadmap identifies what must be protected, where trust chan
 
 Required roadmap artifacts:
 
-- System assets are documented so builders know what data, metadata, retrieval artifacts, graph artifacts, outputs, and operational evidence require protection.
-- Trust boundaries are documented so implementers know where user input, documents, chunks, retrieval results, graph paths, context, and output cross security assumptions.
-- Initial data flows are documented so later phases can place controls at the correct points in the RAG pipeline.
-- Retrieval-specific attack paths are documented for keyword, semantic, and GraphRAG behavior.
+- The system assets are documented.
+- Trust boundaries are documented.
+- Initial data flows are documented.
+- Retrieval-specific attack paths are documented.
 - Threat-to-boundary mapping exists across attack paths, trust boundaries, risks, and controls.
-- Attacker personas and abuse cases are documented so later attack labs can test realistic misuse patterns.
+- Attacker personas and abuse cases are documented.
 - A risk register exists for keyword, semantic, and GraphRAG retrieval risks.
 - A future control backlog maps risks to planned defensive controls.
-- The README reflects the Phase 02 roadmap and the next planned implementation steps for Phase 03 and Phase 04.
+- The README accurately reflects Phase 02 status and the next planned implementation steps.
